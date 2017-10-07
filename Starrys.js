@@ -7,19 +7,90 @@ function starrysDate2js (stDate) {
     return new Date(2000 + d.Year, d.Month, d.Day, t.Hour, t.Minute, t.Second);
 }
 
+const Tax = {
+    VAT18: 1,
+    VAT10: 2,
+    VAT0: 3,
+    WITHOUT: 4,
+    RATE_18_118: 5,
+    RATE_10_110: 6,
+};
 
+const DocumentType = {
+    INCOME: 0,
+    EXPENDITURE: 1,
+    RETURN_INCOME: 2,
+    RETURN_EXPENDITURE: 3,
+};
+
+const TaxMode = {
+    REGULAR: 0,
+    SIMPLIFIED: 0,
+    SIMPLIFIED_MINUS_EXPENDITURE: 0,
+    AGRICULTURAL: 0,
+    PATENT: 0,
+};
+
+
+const ALLOWED_KEYS = {
+    'Group': "string",
+    'Device': "string",
+    'RequestId': "string",
+    'Password': "number",
+    'ClientId': "string",
+    'DocumentType': "number",
+    'Lines': "object",  // Array
+    'Cash': "number",
+    'NonCash': "object",
+    'AdvancePayment': "number",
+    'Credit': "number",
+    'Consideration': "number",
+    'TaxMode': "number",
+    'PhoneOrEmail': "string",
+    'Place': "string",
+    'MaxDocumentsInTurn': "number",
+    'FullResponse': "boolean",
+};
+
+const ALLOWED_LINE_KEYS = {
+    'Qty': "number",
+    'Price': "number",
+    'PayAttribute': "number",
+    'TaxId': "number",
+    'Description': "string",
+};
+
+const rejectRequest = () => Promise.reject(new Error('call proceed for client-less request'));
 class StarrysComplexRequest {
-    constructor (data, evalFunc) {
-        this.data = data || {Lines: []};
+    constructor (evalFunc=rejectRequest) {
         this.evalFunc = evalFunc;
+        this.data = { Lines: [] };
     }
 
-    addLine (value) {
-        this.data.Lines.push(value);
+    addLine (position) {
+        const errored = Object.keys(position).filter((key) => {
+            return typeof position[key] !== ALLOWED_LINE_KEYS[key];
+        });
+
+        if (errored.length > 0) {
+            throw new TypeError(`Wrong position keys/values: ${errored}`);
+        }
+
+        this.data.Lines.push(position);
         return this;
     }
 
     set (name, value) {
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);
+
+        if (ALLOWED_KEYS[name] === undefined) {
+            throw new Error(`Unexpected value: ${name}`);
+        }
+
+        if (typeof value !== ALLOWED_KEYS[name]) {
+            throw new TypeError(`Wrong value type: ${name}, type ${typeof value}`);
+        }
+
         this.data[name] = value;
         return this;
     }
@@ -68,12 +139,10 @@ class StarrysClient {
 
     /**
      * Создает, привязывает к текущему клиенту и возвращает запрос для дальнейшего конфигурирования
-     * @param {array} [lines=[]] массив товарных позиций
      * @return {StarrysComplexRequest} новый запрос
      */
-    create (lines) {
-        const data = { Lines: lines || [] };
-        return new StarrysComplexRequest(data, this.proceed.bind(this));
+    create () {
+        return new StarrysComplexRequest(this.proceed.bind(this));
     }
 
     /**
@@ -114,5 +183,11 @@ class StarrysClient {
 
 module.exports = {
     Request: StarrysComplexRequest,
-    Client: StarrysClient
+    Client: StarrysClient,
+    DocumentType,
+    Tax,
+    TaxMode,
+    thousandth: function thousandth (number) {
+        return number / 1000;
+    }
 };
