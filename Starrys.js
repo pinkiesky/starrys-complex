@@ -64,7 +64,7 @@ const rejectRequest = () => Promise.reject(new Error('call proceed for client-le
 class StarrysComplexRequest {
     constructor (evalFunc=rejectRequest) {
         this.evalFunc = evalFunc;
-        this.data = { Lines: [] };
+        this.data = { };
     }
 
     addLine (position) {
@@ -74,6 +74,10 @@ class StarrysComplexRequest {
 
         if (errored.length > 0) {
             throw new TypeError(`Wrong position keys/values: ${errored}`);
+        }
+
+        if (!this.data.Lines) {
+            this.data.Lines = [];
         }
 
         this.data.Lines.push(position);
@@ -97,6 +101,21 @@ class StarrysComplexRequest {
 
     proceed () {
         return this.evalFunc(this);
+    }
+
+    toJson () {
+        return JSON.stringify(this);
+    }
+
+    static fromJson (income, evalFunc=rejectRequest) {
+        if (typeof income === 'string') {
+            income = JSON.parse(income);
+        }
+
+        const scr = new StarrysComplexRequest(evalFunc);
+        scr.data = income.data;
+
+        return scr;
     }
 }
 
@@ -143,6 +162,15 @@ class StarrysClient {
      */
     create () {
         return new StarrysComplexRequest(this.proceed.bind(this));
+    }
+
+    /**
+     * Создает, привязывает к текущему клиенту запрос на основании json-строки или объекта
+     * @param {string | { data:{} }} json
+     * @return {StarrysComplexRequest}
+     */
+    createFromJson (json) {
+        return StarrysComplexRequest.fromJson(json, this.proceed.bind(this));
     }
 
     /**
