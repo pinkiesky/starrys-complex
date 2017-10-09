@@ -229,6 +229,6 @@ module.exports = {
     Tax,
     TaxMode,
     thousandth: function thousandth (number) {
-        return number / 1000;
+        return number * 1000;
     }
 };
