@@ -38,7 +38,7 @@ describe('Starrys', function() {
         );
 
         it('should call axios function with url and correct data', function (done) {
-            client.postableInstance = {
+            client.httpInstance = {
                 post: (url, data) => {
                     assert.equal(url, 'http://localhost/fr/api/v2/Complex');
                     assert.deepEqual(data, {
@@ -65,7 +65,7 @@ describe('Starrys', function() {
         });
 
         it('should transform starrys response', function () {
-            client.postableInstance = {
+            client.httpInstance = {
                 post: (url, data) => {
                     return Promise.resolve({data: {
                         "RequestId": "D35",
@@ -111,7 +111,7 @@ describe('Starrys', function() {
         });
 
         it('should throw starrys error', function (done) {
-            client.postableInstance = {
+            client.httpInstance = {
                 post: (url, data) => {
                     return Promise.resolve({data: {
                         Response: {

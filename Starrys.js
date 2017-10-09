@@ -7,6 +7,27 @@ function starrysDate2js (stDate) {
     return new Date(2000 + d.Year, d.Month, d.Day, t.Hour, t.Minute, t.Second);
 }
 
+function validateStarrysAnswer(data) {
+    if (!data || Object.keys(data).length <= 0) {
+        throw new Error('wrong `httpInstance` response: ' + JSON.stringify(data));
+    }
+
+    if (data.Response && data.Response.Error > 0) {
+        const e = new Error(data.Response.ErrorMessages || data.Response.Error || 'Starrys api error');
+        e.data = data;
+        console.log(data);
+
+        throw e;
+    }
+
+    return true;
+}
+
+function formatStarrysUrl(url, operation) {
+    return `${url}/fr/api/v2/${operation}`;
+}
+
+
 const Tax = {
     VAT18: 1,
     VAT10: 2,
@@ -125,10 +146,11 @@ class StarrysClient {
      * @constructor
      * @param {string} url адрес формата `https://addr:port`, который вы можете получить в личном кабинете
      * @param {object} [defaults={}] значения по-умолчанию для каждого запроса. Полный список значений смотрите в http://check.starrys.ru/docs/cloudapi_complex.pdf, глава 3
-     * @param {object} postable
-     * @param {function(url, data)} postable.post функция, которая принимает два значения (url и данные) и возвращает Promise
+     * @param {object} httpInstance
+     * @param {function(url)} httpInstance.get функция, которая принимает url и возвращает Promise
+     * @param {function(url, data)} httpInstance.post функция, которая принимает два значения (url и данные) и возвращает Promise
      */
-    constructor (url, defaults, postable) {
+    constructor (url, defaults, httpInstance) {
         if (!url) {
             throw new URIError('Empty url');
         }
@@ -141,7 +163,7 @@ class StarrysClient {
             TaxMode: 1,
             FullResponse: false
         };
-        this.postableInstance = postable;
+        this.httpInstance = httpInstance;
 
         this.setDefaults(defaults);
     }
@@ -174,7 +196,7 @@ class StarrysClient {
     }
 
     /**
-     * Отправляет запрос на удаленный сервер, используя `StarrysClient.postable`
+     * Отправляет запрос на удаленный сервер, используя `StarrysClient.httpInstance`
      * Обычно использовать этот метод не требуется, т.к. все запросы уже привязаны к клиенту
      * @param request запрос для выполнения
      * @return {Promise.<Object>}
@@ -183,19 +205,10 @@ class StarrysClient {
         const data = JSON.parse(JSON.stringify(this.defaults));
         Object.assign(data, request.data);
 
-        return this.postableInstance.post(this.url + '/fr/api/v2/Complex', data)
+        return this.httpInstance.post(formatStarrysUrl(this.url, StarrysOperation.Complex), data)
             .then((resp) => {
                 const data = resp.data || resp;
-                if (!data || Object.keys(data).length <= 0) {
-                    throw new Error('wrong `postable` response: ' + JSON.stringify(data));
-                }
-
-                if (data.Response && data.Response.Error > 0) {
-                    const e = new Error(data.Response.ErrorMessage || data.Response.Error || 'Starrys api error');
-                    e.data = data;
-
-                    throw e;
-                }
+                validateStarrysAnswer(data);
 
                 if (data.Date) {
                     data.__Date__ = data.Date;
