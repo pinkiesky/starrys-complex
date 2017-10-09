@@ -13,6 +13,7 @@ const raw = client
     .set('RequestId', uuid())
     .set('TaxMode', TaxMode.REGULAR)
     .set('ClientId', 'abc')
+    .set('NonCash', [102, 0, 0])
     .proceed()
     .then(console.log)
     .catch((err) => {

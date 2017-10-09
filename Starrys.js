@@ -205,7 +205,7 @@ class StarrysClient {
         const data = JSON.parse(JSON.stringify(this.defaults));
         Object.assign(data, request.data);
 
-        return this.httpInstance.post(formatStarrysUrl(this.url, StarrysOperation.Complex), data)
+        return this.httpInstance.post(formatStarrysUrl(this.url, 'Complex'), data)
             .then((resp) => {
                 const data = resp.data || resp;
                 validateStarrysAnswer(data);
