@@ -6,16 +6,34 @@ JS-библиотека для выполнения запроса `Complex` к 
 
 Более подробную информацию про Starrys и их протокол вы можете прочесть в [официальной документации](http://check.starrys.ru/docs/cloudapi_complex.pdf)
 
+---
 
-## Возможности
+JS-library to fulfill the `Complex` request to the cloud-based online rental service [Starrys](http://check.starrys.ru).
+
+The library supports devices version 3.3.10
+
+For more information about Starrys and their protocol, you can read in [official documentation](http://check.starrys.ru/docs/cloudapi_complex.pdf)
+
+## Возможности/Opportunities
  - Создание запросов
  - Выполнение запросов
  - Независимость от библиотеки для запросов
 
-## Архитектура
+---
+
+ - Creation of requests
+ - Execution of requests
+ - Http-Library independence architecture
+
+## Архитектура/Architecture
 Основная часть библиотеки - класс `StarrysClient`. Он служит для создания запросов, их выполнения и небольшой трансформации данных с сервера
 
-## Example/Пример использования
+---
+
+The main part of the library is the class `StarrysClient`. It is used to create queries, their execution and a small transformation of data from the server
+
+
+## Пример использования/Example
 
 ```js
 const Client = require('starrys-complex').Client;
