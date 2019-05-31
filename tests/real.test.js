@@ -5,15 +5,12 @@ const { Client, Tax, thousandth, TaxMode } = require('../Starrys');
 
 
 const instance = axios.create({ httpsAgent: createAgent(), timeout: 5000 });
-const client = new Client('https://fce.starrys.ru:4443', {}, instance);
+const client = new Client('https://kkt.starrys.ru', {}, instance);
 const raw = client
-    .create()
-    .addLine({Qty: thousandth(1), Price: 100, TaxId: Tax.VAT18, Description: 'Тест 1'})
-    .addLine({Qty: thousandth(2), Price: 1, TaxId: Tax.WITHOUT, Description: 'Тест 2'})
-    .set('RequestId', uuid())
-    .set('TaxMode', TaxMode.REGULAR)
-    .set('ClientId', 'abc')
-    .set('NonCash', [102, 0, 0])
+    .create();
+
+raw.data = {"Lines":[{"Qty":1000,"Price":23430,"TaxId":4,"Description":"Личный кабинет"}],"RequestId":"6c33ec30-3e68-4cfc-b34c-7612fbc4388d","TaxMode":0,"NonCash":[23430,0,0]};
+raw
     .proceed()
     .then(console.log)
     .catch((err) => {
