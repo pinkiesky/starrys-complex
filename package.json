@@ -3,7 +3,10 @@
   "version": "1.2.2",
   "description": "",
   "main": "Starrys.js",
-  "scripts": {
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pinkiesky/starrys-complex.git"
   },
   "author": "",
   "license": "GNU LGPL",
