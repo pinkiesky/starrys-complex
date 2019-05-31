@@ -155,7 +155,7 @@
          * @param {function(url, data)} httpInstance.post функция, которая принимает два значения (url и данные) и возвращает Promise
          */
         constructor(url, defaults, httpInstance) {
-            if (!url) {
+            if (!url || !url.length) {
                 throw new URIError('Empty url');
             }
 
@@ -173,7 +173,7 @@
         }
 
         /**
-         * "Обновляет" значения по-умолчанию для запроса
+         * Обновляет значения по-умолчанию для запроса
          * @param {object} newValues
          * @return {object} новые значения по-умолчанию
          * @see Object.assign
