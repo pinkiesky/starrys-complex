@@ -14,7 +14,7 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "axios": "latest",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "uuid": "^3.1.0"
   }
 }
